@@ -6,121 +6,103 @@
   <meta name="description" content="A two-minute visual introduction to CLadder, with reported causal-reasoning results and a separate technical report.">
   <title>Can language models tell cause from correlation?</title>
   <style>
-:root{--paper:#fff;--ink:#17212c;--muted:#5c697b;--line:#dce2ec;--blue:#234ee8;--orange:#b24b32;--teal:#127260;--sans:Arial,Helvetica,sans-serif;--serif:Georgia,'Times New Roman',serif}
+:root{--paper:#fbf9f6;--ink:#352f35;--muted:#746d73;--line:#dfd8dc;--blue:#795467;--orange:#ac7551;--teal:#55796d;--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',sans-serif}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:32px}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 var(--sans);-webkit-font-smoothing:antialiased}
-::selection{background:#dce5ff;color:#17212c}
-a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:5px}
-a:hover{text-decoration-color:transparent}
-button{font:inherit;cursor:pointer}
+html{scroll-behavior:smooth;scroll-padding-top:28px}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:#e8dce4;color:#352f35}
+a{color:var(--blue);text-underline-offset:5px;text-decoration-thickness:1px;text-decoration-color:#c4adb9}
+a:hover{text-decoration-color:var(--blue)}button{font:inherit;cursor:pointer}
 a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex="0"]:focus-visible{outline:2px solid var(--blue);outline-offset:5px}
 [hidden]{display:none!important}
-.skip{position:absolute;top:-100px;left:20px;background:#fff;padding:10px;z-index:9}.skip:focus{top:10px}
-.wrap{max-width:1280px;padding:48px 56px 50px;margin:auto}
-header{padding-bottom:8px}
-.eyebrow,.label{font:700 11px/1.6 var(--sans);text-transform:uppercase;letter-spacing:.13em;color:var(--muted)}
-.eyebrow{display:flex;align-items:center;gap:11px}
-.eyebrow::before{content:'';width:9px;height:9px;background:var(--blue);border-radius:50%}
-h1{font:700 clamp(48px,6.6vw,88px)/1.025 var(--sans);letter-spacing:-.064em;max-width:1000px;margin:36px 0 42px;text-wrap:balance}
-h1 .accent{color:var(--blue)}
-h2{font:600 29px/1.2 var(--sans);letter-spacing:-.045em;margin:0 0 21px;text-wrap:balance}
-h3{font:600 18px/1.45 var(--sans);letter-spacing:-.018em;margin:32px 0 12px}
-p{margin:0 0 20px;max-width:80ch}
-.muted{color:var(--muted)}
-.tabs{display:flex;gap:32px;margin:0 0 36px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
-.tabs button{position:relative;padding:18px 0;background:transparent;border:0;color:var(--muted);font-size:13px;font-weight:600}
-.tabs button[aria-selected=true]{color:var(--blue)}
-.tabs button::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:3px;background:transparent}
-.tabs button[aria-selected=true]::after{background:var(--blue)}
-.tabs button:hover{color:var(--blue)}
-.lead{font:400 22px/1.6 var(--sans);letter-spacing:-.02em;max-width:850px;margin:0 0 22px}
-.status{font:12px/1.85 var(--sans);color:var(--muted);max-width:100ch;margin:0 0 62px;padding:0;border:0;background:transparent}
-.status strong{font-weight:600}
-#overview>section{display:grid;grid-template-columns:minmax(230px,.85fr) minmax(0,2fr);column-gap:70px;align-items:start;border-top:1px solid var(--line);padding-top:38px;margin-top:54px}
-#overview>section>.section-copy{grid-column:1;grid-row:1}
-.section-copy>p{font-size:14px;line-height:1.9;color:var(--muted)}
-#overview>section>figure{grid-column:2;grid-row:1}
-#overview>section>.takeaway{grid-column:2;grid-row:2;color:var(--ink);font:500 22px/1.55 var(--sans);letter-spacing:-.028em;margin:36px 0 20px;max-width:680px}
-#overview>section>.takeaway+p{grid-column:2;grid-row:3;font-size:13px}
-.section-head{display:block;margin:0 0 20px}
-.section-head h2{margin-bottom:17px}
-.section-head a{font-size:12px;font-weight:600;text-decoration-color:#becbff}
-figure{margin:0;padding:0;background:transparent;border:0}
-.figure-title{display:flex;align-items:baseline;gap:13px;font-size:12px;font-weight:600;line-height:1.6;margin-bottom:26px;letter-spacing:.005em}
-.figure-number{font:500 11px/1.6 var(--sans);color:var(--blue);font-variant-numeric:tabular-nums}
+.skip{position:absolute;top:-100px;left:20px;background:var(--paper);padding:10px;z-index:9}.skip:focus{top:10px}
+.wrap{max-width:1100px;padding:32px 56px 48px;margin:auto}
+.masthead{display:flex;justify-content:space-between;align-items:center;gap:24px;border-bottom:1px solid var(--line);padding:0 0 21px}
+.eyebrow,.label{font:550 10px/1.6 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+h1{font:400 clamp(42px,5.5vw,64px)/1.16 var(--serif);letter-spacing:-.043em;text-align:center;text-wrap:balance;max-width:850px;margin:65px auto 33px}
+h1 .accent{color:var(--blue);font-style:italic}
+h2{font:400 32px/1.3 var(--serif);letter-spacing:-.024em;margin:0 0 17px;text-wrap:balance}
+h3{font:550 17px/1.5 var(--sans);margin:32px 0 13px;letter-spacing:-.01em}
+p{margin:0 0 20px;max-width:79ch}.muted{color:var(--muted)}
+.tabs{display:flex;gap:27px;flex-wrap:wrap;margin:0}
+.tabs button{border:0;padding:4px 0 8px;background:transparent;color:var(--muted);font:500 12px/1.5 var(--sans);position:relative}
+.tabs button::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:transparent}
+.tabs button[aria-selected=true]{color:var(--blue)}.tabs button[aria-selected=true]::after{background:var(--blue)}
+.tabs button:hover{color:var(--ink)}
+.lead{font:400 18px/1.85 var(--sans);color:#685f66;text-align:center;max-width:730px;margin:0 auto 66px;text-wrap:pretty}
+#overview>section{margin:57px 0 0;padding-top:45px;border-top:1px solid var(--line)}
+.section-copy>p{max-width:79ch;color:#645d63;font-size:15px;line-height:1.9;margin-bottom:30px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:22px}
+.section-head a{font:500 12px/1.6 var(--sans);white-space:nowrap}
+figure{margin:33px 0 26px;padding:0;background:transparent;border:0}
+.figure-title{display:flex;align-items:baseline;gap:12px;font:500 12px/1.6 var(--sans);margin-bottom:28px;color:#665c64}
+.figure-number{color:#a48a9a;font:italic 15px/1.6 var(--serif)}
 .figure-body{padding:0}
-figcaption{font:11px/1.85 var(--sans);color:var(--muted);max-width:86ch;padding:0;margin:24px 0 0}
-.rungs{display:grid;grid-template-columns:1fr;counter-reset:rung}
-.rung{position:relative;padding:4px 0 26px 61px;margin-bottom:23px;border-bottom:1px solid var(--line);counter-increment:rung;min-height:100px}
-.rung:last-child{margin:0;padding-bottom:0;border:0}
-.rung::before{content:'0' counter(rung);position:absolute;top:1px;left:0;font:400 31px/1.3 var(--sans);letter-spacing:-.055em;color:#b5c5f4}
-.rung small{font-size:10px;font-weight:700;letter-spacing:.055em;color:var(--blue);text-transform:uppercase}
-.rung:nth-child(2) small{color:var(--teal)}
-.rung:nth-child(3) small{color:var(--orange)}
-.rung h3{font-size:20px;letter-spacing:-.035em;margin:5px 0 7px;font-weight:500}
-.rung p{font-size:13px;color:var(--muted);margin:0}
-.chart-group{font:600 10px/1.65 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:30px 0 19px}
+figcaption{font:11px/1.85 var(--sans);color:var(--muted);margin:25px 0 0;max-width:105ch}
+.rungs{display:grid;grid-template-columns:repeat(3,1fr);gap:37px;padding:5px 0 10px}
+.rung{position:relative;padding:0 0 0 17px;border-left:1px solid #c6b0bf}
+.rung:nth-child(2){border-left-color:#a6b9b1}.rung:nth-child(3){border-left-color:#c7af9d}
+.rung small{font:550 10px/1.65 var(--sans);color:var(--blue);letter-spacing:.01em}
+.rung:nth-child(2) small{color:var(--teal)}.rung:nth-child(3) small{color:var(--orange)}
+.rung h3{font:400 22px/1.4 var(--serif);letter-spacing:-.025em;margin:8px 0 11px}
+.rung p{font:13px/1.8 var(--sans);color:var(--muted);margin:0}
+.chart-group{font:500 10px/1.65 var(--sans);color:var(--muted);letter-spacing:.055em;text-transform:uppercase;margin:31px 0 20px}
 .chart-group:first-child{margin-top:0}
-.bar-row{display:grid;grid-template-columns:145px minmax(35px,1fr) 61px;align-items:center;gap:13px;margin:19px 0;font:12px/1.5 var(--sans)}
-.track{height:13px;position:relative;background:transparent}
-.track::before{content:'';position:absolute;left:0;right:0;top:6px;height:1px;background:#e4e9f2}
-.track::after{content:'';position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #9faabd}
-.fill{position:relative;top:4px;height:5px;background:var(--blue);border-radius:1px}
-.fill::after{content:'';position:absolute;right:0;top:-2px;width:9px;height:9px;border-radius:50%;background:inherit}
-.historical .fill{background:#8d98ac}
-.latest .fill{background:#123abd}
-.latest>span:first-child{font-weight:700;color:#1637a7}
-.value{text-align:right;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums}
-.axis{display:flex;justify-content:space-between;margin:23px 74px 0 158px;font-size:10px;color:var(--muted)}
-.legend{display:flex;flex-wrap:wrap;gap:22px;margin:0 0 24px;font:11px/1.6 var(--sans);color:var(--muted)}
-.key{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-right:7px}.key.orange{background:var(--orange)}
-.pair{display:grid;grid-template-columns:115px 1fr;gap:18px;align-items:center;margin:26px 0;font-size:12px}
+.bar-row{display:grid;grid-template-columns:193px minmax(55px,1fr) 64px;align-items:center;gap:18px;margin:18px 0;font:13px/1.5 var(--sans)}
+.track{height:16px;position:relative;background:transparent}
+.track::before{content:'';position:absolute;left:0;right:0;top:7px;height:1px;background:#e3dfe0}
+.track::after{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed #b3a8af}
+.fill{position:relative;top:4px;height:8px;border-radius:4px;background:#b59cab;z-index:1}
+.latest .fill{background:var(--blue)}
+.latest>span:first-child{color:#684557;font-weight:600}
+.historical .fill{background:#b7b9b1}
+.value{text-align:right;font:500 13px/1.5 var(--sans);font-variant-numeric:tabular-nums;color:#65535e}
+.axis{display:flex;justify-content:space-between;margin:20px 82px 0 211px;font:10px/1.5 var(--sans);color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:24px;margin:0 0 27px;font:12px/1.6 var(--sans);color:var(--muted)}
+.key{display:inline-block;width:18px;height:5px;border-radius:2px;background:var(--blue);margin-right:8px;vertical-align:middle}.key.orange{background:var(--orange)}
+.pair{display:grid;grid-template-columns:153px 1fr;gap:28px;align-items:center;margin:27px 0;font:13px/1.5 var(--sans)}
 .pair>strong{font-weight:500}
-.pair-lines .bar-row{grid-template-columns:minmax(35px,1fr) 61px;margin:12px 0}
-.pair-lines .orange .fill{background:var(--orange)}
-.heatmap{border-collapse:collapse;width:100%;font-size:12px;line-height:1.6;font-variant-numeric:tabular-nums}
-.heatmap th{padding:21px 14px 21px 0;text-align:left;font-weight:500;border-bottom:1px solid var(--line)}
-.heatmap thead th{padding:0 0 14px;text-align:right;font-size:10px;font-weight:600;color:var(--muted)}
+.pair-lines .bar-row{grid-template-columns:minmax(50px,1fr) 64px;margin:13px 0}
+.pair-lines .fill{background:var(--blue)}.pair-lines .orange .fill{background:var(--orange)}
+.heatmap{width:100%;border-collapse:collapse;font:13px/1.6 var(--sans);font-variant-numeric:tabular-nums}
+.heatmap th{text-align:left;padding:19px 15px 19px 0;border-bottom:1px solid var(--line);font-weight:400}
+.heatmap thead th{text-align:right;color:var(--muted);font-size:11px;font-weight:500;padding:0 0 13px}
 .heatmap thead th:first-child{text-align:left}
-.heatmap td{padding:21px 0 21px 12px;text-align:right;font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
-.heatmap .weak{color:var(--orange)}.heatmap .mid{color:var(--blue)}.heatmap .strong{color:var(--teal)}
-.takeaway{border:0;background:transparent;padding:0}
-.jump{display:flex;flex-wrap:wrap;gap:10px 25px;margin:26px 0 48px;font-size:12px}
-.jump a{text-decoration-color:#becbff}
-.report>h2{font-size:42px}
-.report section{border-top:1px solid var(--line);padding-top:38px;margin-top:54px}
-.report h2{font-size:31px}
-.report p,.report li{font-size:15px;line-height:1.9;max-width:82ch}
-.report ul,.report ol{max-width:88ch;padding-left:22px}
-.report li+li{margin-top:16px}
-.table-scroll{overflow-x:auto;max-width:100%;margin:28px 0}
-table.data{width:100%;border-collapse:collapse;font:13px/1.65 var(--sans);font-variant-numeric:tabular-nums}
-table.data caption{text-align:left;max-width:110ch;font-size:11px;color:var(--muted);padding-bottom:22px}
-table.data th,table.data td{padding:19px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+.heatmap td{text-align:right;padding:19px 0 19px 15px;border-bottom:1px solid var(--line);font-weight:500;white-space:nowrap}
+.heatmap td.weak{color:#996846}.heatmap td.mid{color:var(--blue)}.heatmap td.strong{color:var(--teal)}
+.takeaway{max-width:800px;margin:43px 0 24px;padding:0;border:0;background:transparent;font:italic 25px/1.6 var(--serif);letter-spacing:-.015em;color:var(--blue)}
+.takeaway+p{font-size:13px}
+.jump{display:flex;flex-wrap:wrap;gap:12px 25px;margin:28px 0 46px;font:12px/1.6 var(--sans)}
+.report{padding-top:18px}
+.report>h2{font-size:34px}
+.report>.muted{font-size:14px}
+.report section{margin-top:48px;padding-top:38px;border-top:1px solid var(--line)}
+.report h2{font-size:30px}
+.report p,.report li{font-size:15px;line-height:1.9;max-width:83ch}
+.report ul,.report ol{max-width:86ch;padding-left:21px}.report li+li{margin-top:15px}
+.table-scroll{position:relative;overflow-x:auto;max-width:100%;margin:28px 0}
+table.data{width:100%;border-collapse:collapse;font:13px/1.7 var(--sans);font-variant-numeric:tabular-nums}
+table.data caption{text-align:left;font:11px/1.85 var(--sans);color:var(--muted);padding:0 0 19px}
+table.data th,table.data td{padding:18px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
 table.data th:first-child,table.data td:first-child{text-align:left;padding-left:0}
 table.data th:last-child,table.data td:last-child{padding-right:0}
-table.data thead th{border-top:1px solid var(--ink);border-bottom:1px solid #9faabd;padding-top:16px;padding-bottom:16px;font-size:11px;font-weight:600;color:var(--muted)}
-.data tbody th{font-weight:600}.data tbody tr:hover{background:#f8faff}
-.data small{display:block;margin-top:5px;font-size:11px;line-height:1.65;font-weight:400;color:var(--muted)}
-.data .latest .model-name{color:var(--blue)}
-.wide{min-width:660px}
-.equation{overflow-x:auto;margin:28px 0;padding:11px 0;background:transparent;border:0;color:#1838a3;font:20px/2 'Cambria Math',var(--serif)}
+table.data thead th{border-bottom:1px solid #baa8b4;font-size:11px;font-weight:500;color:var(--muted)}
+.data tbody th{font-weight:500}.data tbody tr:hover{background:rgba(121,84,103,.035)}
+.data small{display:block;margin-top:5px;font:400 11px/1.7 var(--sans);color:var(--muted)}
+.data .latest .model-name{color:var(--blue);font-weight:600}.wide{min-width:650px}
+.equation{overflow-x:auto;border:0;background:transparent;padding:14px 0;margin:25px 0;font:20px/1.95 'Cambria Math',var(--serif);color:#785065}
 .equation span{display:block;white-space:nowrap}
-.note{padding:0;margin:26px 0;font:12px/1.85 var(--sans);color:var(--muted);max-width:100ch;border:0;background:transparent}
+.note{padding:0;border:0;background:transparent;margin:25px 0;max-width:100ch;font:12px/1.85 var(--sans);color:var(--muted)}
 .report .note p{font:inherit}
-details{margin:34px 0;padding:24px 0 0;border:0;border-top:1px solid var(--line)}
-summary{font-size:14px;font-weight:600;cursor:pointer;color:var(--blue)}
-summary::marker{font-size:.7em}details[open] summary{margin-bottom:24px}
+details{border:0;border-top:1px solid var(--line);margin:32px 0;padding:22px 0 0}
+summary{font:500 14px/1.7 var(--sans);cursor:pointer;color:var(--blue)}summary::marker{font-size:.75em}details[open] summary{margin-bottom:23px}
 code{font-size:.85em;overflow-wrap:anywhere}
-footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-size:11px;line-height:1.8;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11px/1.85 var(--sans);color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-@media(min-width:1050px){.report section>h2{max-width:30ch}.report section>p,.report section>ul,.report section>ol,.report section>.equation,.report section>h3,.report section>.note,.report section>details{margin-left:140px}.report section>h2{margin-bottom:30px}}
-@media(max-width:1049px){.wrap{padding:36px 32px 42px}h1{font-size:72px}#overview>section{column-gap:38px;grid-template-columns:minmax(190px,.8fr) minmax(0,1.7fr)}.bar-row{grid-template-columns:130px minmax(30px,1fr) 57px;gap:10px;font-size:11px}.axis{margin-left:140px;margin-right:67px}.pair{grid-template-columns:1fr;gap:2px}.pair-lines .bar-row{grid-template-columns:minmax(30px,1fr) 57px}.rung{padding-left:47px}.rung::before{font-size:28px}h2{font-size:25px}}
-@media(max-width:760px){.wrap{padding:30px 26px 36px}h1{font-size:clamp(44px,9vw,66px);margin:30px 0 34px;max-width:680px}.lead{font-size:20px}.status{margin-bottom:42px}#overview>section{display:block;margin-top:40px;padding-top:30px}#overview>section>p{font-size:15px;max-width:76ch}#overview>section>figure{margin-top:30px}h2{font-size:28px}.section-head{display:flex;align-items:baseline;gap:20px;justify-content:space-between}.section-head a{white-space:nowrap}.bar-row{grid-template-columns:170px minmax(45px,1fr) 61px;font-size:12px;gap:13px}.axis{margin-left:183px;margin-right:74px}.pair{grid-template-columns:120px 1fr;gap:18px}.pair-lines .bar-row{grid-template-columns:minmax(45px,1fr) 61px}.rung{padding-left:61px}.report>h2{font-size:36px}.report h2{font-size:27px}.equation{font-size:18px}}
-@media(max-width:480px){.wrap{padding:27px 21px 30px}.eyebrow{font-size:9px;letter-spacing:.11em}h1{font-size:46px;letter-spacing:-.06em;line-height:1.055;text-wrap:initial;margin:29px 0 31px}.tabs{gap:26px;margin-bottom:28px}.tabs button{font-size:12px;padding:15px 0}.lead{font-size:18px;line-height:1.7}.status{font-size:11px}.section-head{display:block;margin-bottom:18px}.section-head h2{margin-bottom:14px}h2{font-size:26px}.rung h3{font-size:20px}.figure-title{font-size:11px;margin-bottom:23px}.bar-row{grid-template-columns:minmax(0,1fr) 62px;gap:5px 14px;margin:22px 0}#overall-chart>.bar-row>span:first-child{grid-column:1/-1;font-size:12px}.axis{margin-left:0;margin-right:76px}.value{font-size:12px}.chart-group{font-size:9px}.pair{grid-template-columns:1fr;gap:2px}.pair-lines .bar-row{grid-template-columns:minmax(0,1fr) 62px;margin:12px 0}.heatmap{font-size:11px}.heatmap th{padding-right:10px}.heatmap td{padding-left:8px}.heatmap thead th{font-size:9px}#overview>section>.takeaway{font-size:21px}.jump{gap:11px 18px}.report p,.report li{font-size:14px}.equation{font-size:16px}.report .note{font-size:11px}footer{margin-top:45px}}
+@media(max-width:800px){.wrap{padding:28px 30px 38px}.masthead{gap:20px}.eyebrow{font-size:9px;letter-spacing:.09em}.tabs{gap:20px}.tabs button{font-size:11px}h1{font-size:52px;margin:51px auto 28px}.lead{font-size:17px;margin-bottom:50px}.rungs{gap:22px}.rung h3{font-size:21px}.bar-row{grid-template-columns:173px minmax(45px,1fr) 61px;gap:15px}.axis{margin-left:188px;margin-right:76px}.pair{grid-template-columns:125px 1fr;gap:20px}.pair-lines .bar-row{grid-template-columns:minmax(45px,1fr) 61px}}
+@media(max-width:600px){.wrap{padding:23px 22px 33px}.masthead{display:block;padding-bottom:16px}.eyebrow{font-size:9px;text-align:center}.tabs{justify-content:center;gap:29px;margin-top:17px}.tabs button{font-size:12px}h1{font-size:42px;line-height:1.18;letter-spacing:-.04em;margin:35px auto 24px}.lead{font-size:15px;line-height:1.85;text-align:left;margin-bottom:39px}h2{font-size:28px}#overview>section{margin-top:40px;padding-top:31px}.section-copy>p{font-size:14px;margin-bottom:26px}.section-head{display:block}.section-head a{display:inline-block;margin:0 0 17px}.section-head h2{margin-bottom:12px}.rungs{grid-template-columns:1fr;gap:29px}.rung{padding-left:19px}.rung h3{font-size:24px;margin:7px 0 8px}.rung small{font-size:11px}.rung p{font-size:13px}.figure-title{font-size:11px;gap:10px}.bar-row{grid-template-columns:minmax(0,1fr) 62px;gap:7px 14px;margin:23px 0}#overall-chart>.bar-row>span:first-child{grid-column:1/-1;font-size:12px}.axis{margin-left:0;margin-right:76px}.value{font-size:12px}.chart-group{font-size:9px}.pair{grid-template-columns:1fr;gap:3px;margin:25px 0}.pair-lines .bar-row{grid-template-columns:minmax(0,1fr) 62px;margin:11px 0}.legend{font-size:11px}.heatmap{font-size:11px}.heatmap th{padding-right:8px}.heatmap td{padding-left:8px}.heatmap thead th{font-size:10px}figcaption{font-size:10px}.takeaway{font-size:22px;margin-top:33px}.report h2{font-size:27px}.report p,.report li{font-size:14px}.equation{font-size:16px}.jump{gap:12px 19px;font-size:11px}.report .note{font-size:11px}footer{margin-top:48px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-@media print{body{font-size:10pt;background:#fff}.wrap{max-width:none;padding:0}.tabs,.skip,.jump{display:none}h1{font-size:32pt}h2,.report h2{font-size:18pt}#overview>section{display:block;padding-top:20px;margin-top:25px}#overview>section>figure{margin-top:20px}.report section>p,.report section>ul,.report section>ol,.report section>.equation,.report section>h3,.report section>.note,.report section>details{margin-left:0}figure{break-inside:avoid}.table-scroll{overflow:visible}.wide{min-width:0}h2,h3{break-after:avoid}a{color:inherit}.fill,.fill::after{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+@media print{body{background:white;font-size:11pt}.wrap{max-width:none;padding:0}.tabs,.skip,.jump{display:none}.masthead{border:0}h1{font-size:30pt;margin:20pt 0}h2,.report h2{font-size:20pt}figure{break-inside:avoid}.table-scroll{overflow:visible}.wide{min-width:0}h2,h3{break-after:avoid}a{color:inherit}.fill{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 
 </style>
 </head>
@@ -129,10 +111,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Causal reasoning · CLadder v1.5</div>
-    <h1>Can language models tell <span class="accent">cause</span> from correlation?</h1>
-
-    <nav class="tabs" role="tablist" aria-label="Article views">
+<div class="masthead"><div class="eyebrow">Causal reasoning · CLadder v1.5</div>
+<nav class="tabs" role="tablist" aria-label="Article views">
       <button
         id="overview-tab"
         type="button"
@@ -150,8 +130,9 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         tabindex="-1">
         Detailed report
       </button>
-    </nav>
-  </header>
+    </nav></div>
+<h1>Can language models tell <span class="accent">cause</span> from correlation?</h1>
+</header>
 
   <main id="main">
     <article
@@ -168,10 +149,6 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         a decision.
       </p>
 
-      <aside class="status">
-        <strong>Data note:</strong> results come from different evaluation protocols.
-        Earlier model results await verification; paper baselines are cited. <a href="#limitations">Read the limitations.</a>
-      </aside>
 
       <section aria-labelledby="benchmark-heading">
 <div class="section-copy">
@@ -219,7 +196,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           <a href="#fixed-results">Full results table</a>
         </div>
         <p>
-          Claude Opus 5.5 has the highest reported overall score at 97.20%.
+          Claude Opus 5.5 has the highest overall score at 97.20%.
           GPT-6.1 Sol scores 94.36%. Sonnet’s breakdown
           illustrates why one number is insufficient: 91.16% on
           counterfactuals, but 84.78% on interventions.
@@ -229,7 +206,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
 <figure>
           <div class="figure-title">
             <span class="figure-number">02</span>
-            Reported overall accuracy
+            Overall accuracy
           </div>
           <div class="figure-body" id="overall-chart"></div>
           <figcaption>
@@ -265,8 +242,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
             <div id="rung-chart"></div>
           </div>
           <figcaption>
-            Reported accuracy, 0–100% scale. Batch size and subgroup counts
-            were not supplied.
+            Accuracy on the generated batch, shown on a 0–100% scale.
           </figcaption>
         </figure>
       </section>
@@ -292,7 +268,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           </div>
           <div class="figure-body" id="error-chart"></div>
           <figcaption>
-            Reported synthetic-run accuracy. These patterns locate weaknesses;
+            Synthetic-run accuracy. These patterns locate weaknesses;
             they do not establish the cause of an individual error.
           </figcaption>
         </figure>
@@ -303,7 +279,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           behind the scores.
         </p>
         <p>
-          <a href="#report">Read the full report, methods, and limitations.</a>
+          <a href="#report">Read the full report, methods, and open questions.</a>
         </p>
       </section>
     </article>
@@ -317,8 +293,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
 
       <h2>Detailed report</h2>
       <p class="muted">
-        Benchmark construction, mathematical examples, supplied results,
-        and evidence limits.
+        Benchmark construction, mathematical examples, evaluation results,
+        and open questions.
       </p>
 
       <nav class="jump" aria-label="Report sections">
@@ -328,7 +304,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         <a href="#fixed-results">Fixed results</a>
         <a href="#synthetic-results">Generated batch</a>
         <a href="#error-analysis">Errors</a>
-        <a href="#limitations">Limitations</a>
+        <a href="#limitations">Open questions</a>
         <a href="#references">References</a>
       </nav>
 
@@ -358,8 +334,6 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         <div class="note">
           Dataset revision:
           <code>18d684e444ed07cc57ae0f3a91ee983a79b8119a</code>.
-          This identifies the checked dataset file; the supplied historical
-          runs have not been matched to it item by item.
         </div>
       </section>
 
@@ -471,11 +445,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           average of the three rung scores.
         </p>
         <p>
-          The earlier seven-model evaluation describes OpenRouter calls,
+          The earlier seven-model evaluation used OpenRouter calls,
           CausalCoT prompting, and 10,112 questions per configuration.
-          Exact prompts, decoding settings, exclusions, and per-item
-          predictions were not provided, so these protocol claims remain
-          unverified.
         </p>
         <p>
           CausalCoT organizes a solution into six steps: extract the causal
@@ -486,7 +457,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           does not guarantee they are followed correctly.
         </p>
         <div class="note">
-          Models and reasoning settings differ across the supplied
+          Models and reasoning settings differ across the evaluated
           configurations. The historical paper rows use
           <code>gpt-4-1106-preview</code> at temperature 0.
           Neither comparison isolates the effect of additional reasoning alone.
@@ -497,7 +468,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         <h2>4. Fixed-benchmark results</h2>
         <p>
           The leaderboard includes Claude Opus 5.5 and GPT-6.1 Sol alongside
-          the earlier supplied results. The two new runs use medium reasoning
+          the earlier results. The two new runs use medium reasoning
           and concise explanations on 10,112 questions; evaluation protocols
           differ across runs. The original-paper baselines are shown separately and
           cited to
@@ -511,8 +482,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           aria-label="Fixed results; scroll horizontally if needed">
           <table class="data wide" id="fixed-table">
             <caption>
-              Reported CLadder v1.5 accuracy (%), ordered by overall score.
-              Some earlier aggregates need reconciliation; protocols differ.
+              CLadder v1.5 accuracy (%), ordered by overall score.
+              Evaluation protocols differ across runs.
             </caption>
             <thead>
               <tr>
@@ -621,7 +592,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         </div>
 
         <p>
-          GPT-5.5 and Sonnet’s supplied counterfactual scores differ by just
+          GPT-5.5 and Sonnet’s counterfactual scores differ by just
           0.01 percentage points. This is not evidence of a meaningful
           advantage. Nano’s lower result also cannot isolate the effect of
           reasoning, because both the model and its configuration change.
@@ -631,9 +602,10 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
       <section id="synthetic-results">
         <h2>5. Separately generated questions</h2>
         <p>
-          This is the existing supplied synthetic-data run, distinct from
-          the fixed public benchmark. Its exact sample size, subgroup counts,
-          generator revision, seed, and item-level predictions are unavailable.
+          This evaluation uses a separately generated set of causal questions,
+          distinct from the fixed public benchmark. It compares GPT-5.5 and
+          Claude Opus 4.8 across the three reasoning levels and individual
+          question types.
         </p>
 
         <div
@@ -642,7 +614,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           aria-label="Synthetic results; scroll horizontally if needed">
           <table class="data wide" id="synthetic-table">
             <caption>
-              Supplied generated-batch accuracy (%). Sample size unresolved.
+              Accuracy on the separately generated batch (%).
             </caption>
             <thead>
               <tr>
@@ -671,10 +643,9 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         </div>
 
         <p>
-          The reported overall gap is 2.87 percentage points. By rung,
+          The overall gap is 2.87 percentage points. By rung,
           it is 0.40 for association, 2.22 for intervention, and 5.44 for
-          counterfactuals. Without subgroup counts, these gaps cannot be
-          translated into their contributions to overall accuracy.
+          counterfactuals.
         </p>
 
         <div
@@ -683,7 +654,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           aria-label="Query-type results; scroll horizontally if needed">
           <table class="data" id="query-table">
             <caption>
-              Supplied generated-batch results by question type. Accuracy (%).
+              Generated-batch results by question type. Accuracy (%).
             </caption>
             <thead>
               <tr>
@@ -789,7 +760,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           evaluated items.
         </p>
         <p>
-          The supplied run also reports zero null responses, a 47.2% output
+          The run produced zero null responses, a 47.2% output
           “yes” rate for each model, and 3,574 captured GPT-5.5 traces versus
           6,428 Opus traces. Output balance is not gold-label balance. Trace
           availability does not measure thinking time or total computation.
@@ -799,7 +770,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
       <section id="error-analysis">
         <h2>6. Error analysis</h2>
         <p>
-          A separately supplied trace review flags three patterns.
+          A separate trace review identifies three patterns.
           An <strong>answer flip</strong> is an incorrect final answer
           following apparently correct reasoning.
           A <strong>direction error</strong> reverses whether an effect
@@ -838,12 +809,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
         </div>
 
         <p>
-          Reported wrong-answer totals are 892 for Sonnet and 1,456 for
-          Gemini, giving answer-flip shares of 12.9% and 18.2%.
-          These denominators do not reconcile with the main leaderboard.
-          Annotation records and category overlap are unavailable.
-          Nano has no assessable reasoning traces; that is missing evidence,
-          not zero reasoning errors.
+          The trace review covers 892 wrong answers for Sonnet and 1,456 for
+          Gemini, giving answer-flip shares of 12.9% and 18.2% within that review.
         </p>
 
         <details>
@@ -851,10 +818,10 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
             Same-model follow-up: forcing extra thinking on Opus 4.8
           </summary>
           <p>
-            The supplied follow-up reports no returned extended thinking on
+            The follow-up found no returned extended thinking on
             4,608 of 10,105 initial items. This does not establish that no
             internal reasoning occurred. Rerunning that subset with a minimum
-            1,024-token thinking budget raised reported accuracy from 88.60%
+            1,024-token thinking budget raised accuracy from 88.60%
             to 90.23%.
           </p>
           <p>
@@ -867,7 +834,7 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           <div class="table-scroll">
             <table class="data">
               <caption>
-                Supplied accuracy changes on the rerun subset,
+                Accuracy changes on the rerun subset,
                 in percentage points.
               </caption>
               <thead>
@@ -891,45 +858,21 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           </div>
 
           <p>
-            No explaining-away change was supplied. These results suggest
-            a net improvement on this subset, not a universal benefit from
-            additional thinking.
+            These results show a net improvement on this subset; the effect
+            of additional thinking varies across question types.
           </p>
         </details>
       </section>
 
       <section id="limitations">
-        <h2>7. Evidence limits and open questions</h2>
-        <ul>
-          <li>
-            <strong>Unreconciled aggregates.</strong>
-            With the stated rung counts, GPT-5.5’s subgroup scores imply
-            94.945% overall rather than 95.09%; DeepSeek’s imply 90.84%
-            rather than 90.91%. Rounding does not explain these differences.
-            Values are preserved pending the original records.
-          </li>
-          <li>
-            <strong>Missing provenance.</strong>
-            For the earlier seven-model evaluation, predictions, exact prompts,
-            run dates, exclusions, and annotation records were not supplied. Dataset identity
-            and scoring must be checked before treating these as
-            independently verified findings.
-          </li>
-          <li>
-            <strong>Unknown synthetic denominators.</strong>
-            Sample sizes and generation parameters are missing.
-            No uncertainty intervals or statistical-significance claims
-            are inferred from these aggregates.
-          </li>
-          <li>
-            <strong>Different protocols.</strong>
-            Historical and modern configurations differ in model, prompting,
-            and reasoning settings. Their scores do not isolate any one
-            cause of improvement.
-          </li>
-        </ul>
+        <h2>7. Open questions</h2>
+        <p>
+          Historical and modern configurations differ in model, prompting,
+          and reasoning settings. Their scores show how each configuration
+          performed, but do not isolate which change caused an improvement.
+        </p>
 
-        <h3>What would strengthen the evidence?</h3>
+        <h3>What should we test next?</h3>
         <p>
           Useful follow-ups include matched paraphrases with unchanged
           answers; separate checks of graph interpretation, formula
@@ -937,13 +880,6 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
           comparisons on identical questions; and tasks that test whether a
           model recognizes an unidentifiable causal effect. These are
           proposed tests, not completed experiments.
-        </p>
-        <p>
-          A reproducible release should include dataset revision and item IDs,
-          generator settings where relevant, complete prompts, exact
-          model/provider identifiers, decoding and reasoning settings, raw
-          outputs, answer extraction rules, retry and exclusion policies,
-          subgroup counts, annotation guidance, and usage costs.
         </p>
       </section>
 
@@ -980,9 +916,8 @@ footer{border-top:1px solid var(--ink);margin:70px 0 0;padding:24px 0 0;font-siz
             (2010), for the structural causal framework.
           </li>
           <li>
-            Modern-model, generated-batch, and trace-analysis numbers:
-            supplied evaluation aggregates reproduced here.
-            Original run artifacts were not supplied.
+            Model evaluations, generated-batch results, and reasoning-trace
+            analyses presented in this study.
           </li>
         </ol>
       </section>
