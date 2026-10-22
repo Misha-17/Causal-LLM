@@ -197,7 +197,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         </div>
         <p>
           Claude Opus 5.5 has the highest overall score at 97.20%.
-          GPT-6.1 Sol scores 94.36%. Sonnet’s breakdown
+          Gemini Argon scores 95.67% and GPT-6.1 Sol 94.36%. Sonnet’s breakdown
           illustrates why one number is insufficient: 91.16% on
           counterfactuals, but 84.78% on interventions.
         </p>
@@ -467,10 +467,12 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
       <section id="fixed-results">
         <h2>4. Fixed-benchmark results</h2>
         <p>
-          The leaderboard includes Claude Opus 5.5 and GPT-6.1 Sol alongside
-          the earlier results. The two new runs use medium reasoning
-          and concise explanations on 10,112 questions; evaluation protocols
-          differ across runs. The original-paper baselines are shown separately and
+          The leaderboard includes Claude Opus 5.5, GPT-6.1 Sol and Gemini Argon
+          alongside the earlier results. The Opus 5.5 and GPT-6.1 Sol runs use
+          medium reasoning and concise explanations on 10,112 questions.
+          Gemini Argon uses high reasoning, a zero-shot instruction to answer
+          only yes or no, and a 6,144-token completion limit that includes
+          reasoning. Evaluation protocols differ across runs. The original-paper baselines are shown separately and
           cited to
           <a href="https://arxiv.org/html/2312.04350v3#S5.T2">Table 2</a>.
           They are historical reported measurements, not reruns.
@@ -496,6 +498,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
             </thead>
             <tbody>
 <tr class="latest" data-model="anthropic/claude-opus-5.5"><th scope="row"><span class="model-name">Claude Opus 5.5</span><small>Medium reasoning · concise explanation<br><code>anthropic/claude-opus-5.5</code></small></th><td>97.20</td><td>97.41</td><td>99.53</td><td>95.09</td></tr>
+<tr class="latest" data-model="google/gemini-4-argon"><th scope="row"><span class="model-name">Gemini Argon</span><small>High reasoning · zero-shot yes/no · 6,144-token limit<br><code>google/gemini-4-argon</code></small></th><td>95.67</td><td>97.41</td><td>94.97</td><td>94.80</td></tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">GPT-5.5</span>
@@ -596,6 +599,16 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
           0.01 percentage points. This is not evidence of a meaningful
           advantage. Nano’s lower result also cannot isolate the effect of
           reasoning, because both the model and its configuration change.
+        </p>
+        <p>
+          Gemini Argon’s score counts 175 invalid responses as incorrect:
+          173 hit the token limit before giving an answer and 2 ended with a
+          provider error. Of its 438 misses, 263 are wrong yes/no answers.
+          On the 9,937 valid answers, accuracy is 97.35%. The truncations
+          concentrate on intervention questions (149 of 175), and they account
+          for all 84 missed backdoor-adjustment items and all 64 missed
+          collider-bias items, where Argon scores 59.49%. Its intervention
+          score therefore reflects the token limit as well as reasoning.
         </p>
       </section>
 
