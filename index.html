@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="A two-minute visual introduction to CLadder, with reported causal-reasoning results and a separate technical report.">
+  <meta name="description" content="CLadder tests whether language models can reason about cause and effect. Results and a detailed report.">
   <title>Can language models tell cause from correlation?</title>
   <style>
 :root{--paper:#fbf9f6;--ink:#352f35;--muted:#746d73;--line:#dfd8dc;--blue:#795467;--orange:#ac7551;--teal:#55796d;--serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -31,9 +31,15 @@ p{margin:0 0 20px;max-width:79ch}.muted{color:var(--muted)}
 .tabs button:hover{color:var(--ink)}
 .lead{font:400 18px/1.85 var(--sans);color:#685f66;text-align:center;max-width:730px;margin:0 auto 66px;text-wrap:pretty}
 #overview>section{margin:57px 0 0;padding-top:45px;border-top:1px solid var(--line)}
-.section-copy>p{max-width:79ch;color:#645d63;font-size:15px;line-height:1.9;margin-bottom:30px}
+.section-copy>p{max-width:79ch;color:#645d63;font-size:15px;line-height:1.9;margin-bottom:22px}
+.section-copy>p:last-child{margin-bottom:30px}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:22px}
 .section-head a{font:500 12px/1.6 var(--sans);white-space:nowrap}
+.example{margin:6px 0 40px;padding:2px 0 2px 19px;border-left:1px solid #c6b0bf;max-width:79ch}
+.example .label{display:block;margin-bottom:10px}
+.example p{font-size:14px;line-height:1.85;color:#5c545a;margin:0 0 12px}
+.example p:last-child{margin-bottom:0}
+.example strong{font-weight:600;color:var(--ink)}
 figure{margin:33px 0 26px;padding:0;background:transparent;border:0}
 .figure-title{display:flex;align-items:baseline;gap:12px;font:500 12px/1.6 var(--sans);margin-bottom:28px;color:#665c64}
 .figure-number{color:#a48a9a;font:italic 15px/1.6 var(--serif)}
@@ -62,10 +68,12 @@ figcaption{font:11px/1.85 var(--sans);color:var(--muted);margin:25px 0 0;max-wid
 .key{display:inline-block;width:18px;height:5px;border-radius:2px;background:var(--blue);margin-right:8px;vertical-align:middle}.key.orange{background:var(--orange)}
 .pair{display:grid;grid-template-columns:153px 1fr;gap:28px;align-items:center;margin:27px 0;font:13px/1.5 var(--sans)}
 .pair>strong{font-weight:500}
+.pair>strong small{display:block;font:500 10px/1.6 var(--sans);letter-spacing:.055em;text-transform:uppercase;color:var(--muted)}
 .pair-lines .bar-row{grid-template-columns:minmax(50px,1fr) 64px;margin:13px 0}
 .pair-lines .fill{background:var(--blue)}.pair-lines .orange .fill{background:var(--orange)}
 .heatmap{width:100%;border-collapse:collapse;font:13px/1.6 var(--sans);font-variant-numeric:tabular-nums}
 .heatmap th{text-align:left;padding:19px 15px 19px 0;border-bottom:1px solid var(--line);font-weight:400}
+.heatmap th small{display:block;max-width:46ch;margin-top:3px;font:400 11px/1.65 var(--sans);color:var(--muted)}
 .heatmap thead th{text-align:right;color:var(--muted);font-size:11px;font-weight:500;padding:0 0 13px}
 .heatmap thead th:first-child{text-align:left}
 .heatmap td{text-align:right;padding:19px 0 19px 15px;border-bottom:1px solid var(--line);font-weight:500;white-space:nowrap}
@@ -79,7 +87,7 @@ figcaption{font:11px/1.85 var(--sans);color:var(--muted);margin:25px 0 0;max-wid
 .report section{margin-top:48px;padding-top:38px;border-top:1px solid var(--line)}
 .report h2{font-size:30px}
 .report p,.report li{font-size:15px;line-height:1.9;max-width:83ch}
-.report ul,.report ol{max-width:86ch;padding-left:21px}.report li+li{margin-top:15px}
+.report ul,.report ol{max-width:86ch;padding-left:21px;margin:0 0 22px}.report li+li{margin-top:12px}
 .table-scroll{position:relative;overflow-x:auto;max-width:100%;margin:28px 0}
 table.data{width:100%;border-collapse:collapse;font:13px/1.7 var(--sans);font-variant-numeric:tabular-nums}
 table.data caption{text-align:left;font:11px/1.85 var(--sans);color:var(--muted);padding:0 0 19px}
@@ -92,15 +100,21 @@ table.data thead th{border-bottom:1px solid #baa8b4;font-size:11px;font-weight:5
 .data .latest .model-name{color:var(--blue);font-weight:600}.wide{min-width:650px}
 .equation{overflow-x:auto;border:0;background:transparent;padding:14px 0;margin:25px 0;font:20px/1.95 'Cambria Math',var(--serif);color:#785065}
 .equation span{display:block;white-space:nowrap}
+.equation .gloss{white-space:normal;max-width:70ch;margin:0 0 16px;font:13px/1.75 var(--sans);color:var(--muted)}
+.equation .gloss:last-child{margin-bottom:0}
 .note{padding:0;border:0;background:transparent;margin:25px 0;max-width:100ch;font:12px/1.85 var(--sans);color:var(--muted)}
 .report .note p{font:inherit}
 details{border:0;border-top:1px solid var(--line);margin:32px 0;padding:22px 0 0}
 summary{font:500 14px/1.7 var(--sans);cursor:pointer;color:var(--blue)}summary::marker{font-size:.75em}details[open] summary{margin-bottom:23px}
+dl.terms{margin:26px 0 0;max-width:83ch}
+dl.terms dt{font:550 15px/1.6 var(--sans);margin-top:24px}
+dl.terms dt:first-child{margin-top:0}
+dl.terms dd{margin:5px 0 0;font-size:15px;line-height:1.9;color:#5c545a}
 code{font-size:.85em;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11px/1.85 var(--sans);color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:800px){.wrap{padding:28px 30px 38px}.masthead{gap:20px}.eyebrow{font-size:9px;letter-spacing:.09em}.tabs{gap:20px}.tabs button{font-size:11px}h1{font-size:52px;margin:51px auto 28px}.lead{font-size:17px;margin-bottom:50px}.rungs{gap:22px}.rung h3{font-size:21px}.bar-row{grid-template-columns:173px minmax(45px,1fr) 61px;gap:15px}.axis{margin-left:188px;margin-right:76px}.pair{grid-template-columns:125px 1fr;gap:20px}.pair-lines .bar-row{grid-template-columns:minmax(45px,1fr) 61px}}
-@media(max-width:600px){.wrap{padding:23px 22px 33px}.masthead{display:block;padding-bottom:16px}.eyebrow{font-size:9px;text-align:center}.tabs{justify-content:center;gap:29px;margin-top:17px}.tabs button{font-size:12px}h1{font-size:42px;line-height:1.18;letter-spacing:-.04em;margin:35px auto 24px}.lead{font-size:15px;line-height:1.85;text-align:left;margin-bottom:39px}h2{font-size:28px}#overview>section{margin-top:40px;padding-top:31px}.section-copy>p{font-size:14px;margin-bottom:26px}.section-head{display:block}.section-head a{display:inline-block;margin:0 0 17px}.section-head h2{margin-bottom:12px}.rungs{grid-template-columns:1fr;gap:29px}.rung{padding-left:19px}.rung h3{font-size:24px;margin:7px 0 8px}.rung small{font-size:11px}.rung p{font-size:13px}.figure-title{font-size:11px;gap:10px}.bar-row{grid-template-columns:minmax(0,1fr) 62px;gap:7px 14px;margin:23px 0}#overall-chart>.bar-row>span:first-child{grid-column:1/-1;font-size:12px}.axis{margin-left:0;margin-right:76px}.value{font-size:12px}.chart-group{font-size:9px}.pair{grid-template-columns:1fr;gap:3px;margin:25px 0}.pair-lines .bar-row{grid-template-columns:minmax(0,1fr) 62px;margin:11px 0}.legend{font-size:11px}.heatmap{font-size:11px}.heatmap th{padding-right:8px}.heatmap td{padding-left:8px}.heatmap thead th{font-size:10px}figcaption{font-size:10px}.takeaway{font-size:22px;margin-top:33px}.report h2{font-size:27px}.report p,.report li{font-size:14px}.equation{font-size:16px}.jump{gap:12px 19px;font-size:11px}.report .note{font-size:11px}footer{margin-top:48px}}
+@media(max-width:600px){.wrap{padding:23px 22px 33px}.masthead{display:block;padding-bottom:16px}.eyebrow{font-size:9px;text-align:center}.tabs{justify-content:center;gap:29px;margin-top:17px}.tabs button{font-size:12px}h1{font-size:42px;line-height:1.18;letter-spacing:-.04em;margin:35px auto 24px}.lead{font-size:15px;line-height:1.85;text-align:left;margin-bottom:39px}h2{font-size:28px}#overview>section{margin-top:40px;padding-top:31px}.section-copy>p{font-size:14px;margin-bottom:20px}.section-head{display:block}.section-head a{display:inline-block;margin:0 0 17px}.section-head h2{margin-bottom:12px}.example{padding-left:16px}.example p{font-size:13px}.rungs{grid-template-columns:1fr;gap:29px}.rung{padding-left:19px}.rung h3{font-size:24px;margin:7px 0 8px}.rung small{font-size:11px}.rung p{font-size:13px}.figure-title{font-size:11px;gap:10px}.bar-row{grid-template-columns:minmax(0,1fr) 62px;gap:7px 14px;margin:23px 0}#overall-chart>.bar-row>span:first-child{grid-column:1/-1;font-size:12px}.axis{margin-left:0;margin-right:76px}.value{font-size:12px}.chart-group{font-size:9px}.pair{grid-template-columns:1fr;gap:3px;margin:25px 0}.pair-lines .bar-row{grid-template-columns:minmax(0,1fr) 62px;margin:11px 0}.legend{font-size:11px}.heatmap{font-size:11px}.heatmap th{padding-right:8px}.heatmap th small{font-size:10px}.heatmap td{padding-left:8px}.heatmap thead th{font-size:10px}figcaption{font-size:10px}.takeaway{font-size:22px;margin-top:33px}.report h2{font-size:27px}.report p,.report li{font-size:14px}.equation{font-size:16px}.equation .gloss{font-size:12px}dl.terms dt,dl.terms dd{font-size:14px}.jump{gap:12px 19px;font-size:11px}.report .note{font-size:11px}footer{margin-top:48px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media print{body{background:white;font-size:11pt}.wrap{max-width:none;padding:0}.tabs,.skip,.jump{display:none}.masthead{border:0}h1{font-size:30pt;margin:20pt 0}h2,.report h2{font-size:20pt}figure{break-inside:avoid}.table-scroll{overflow:visible}.wide{min-width:0}h2,h3{break-after:avoid}a{color:inherit}.fill{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 
@@ -143,143 +157,207 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
       tabindex="0">
 
       <p class="lead">
-        People who use an AI assistant may finish more tasks. Did the assistant
-        help, or did they start with easier tasks? Reliable advice depends on
-        separating an observed pattern from what would happen if we changed
-        a decision.
+        Suppose people who use an AI assistant finish more of their tasks.
+        Does the assistant help? Or did they have easier tasks to begin with?
+        The numbers alone can’t tell you. You have to reason about cause and
+        effect. We tested how well language models do this.
       </p>
 
 
       <section aria-labelledby="benchmark-heading">
-<div class="section-copy">
-        <h2 id="benchmark-heading">A controlled test of causal reasoning</h2>
-        <p>
-          CLadder turns small causal worlds into questions with mathematically
-          derived yes/no answers. Its balanced v1.5 set contains 10,112 questions.
-          Models receive the facts and question; reference answers stay hidden.
-        </p>
-
+        <div class="section-copy">
+          <h2 id="benchmark-heading">A test with known answers</h2>
+          <p>
+            CLadder is a set of 10,112 yes/no questions about cause and effect.
+            Each question describes a small, made-up world. It says which
+            factors affect which, and it gives some probabilities. The right
+            answer follows from the math, so it is known for certain. The model
+            sees the description and the question. It never sees the answer.
+            Half the answers are yes and half are no, so random guessing
+            scores 50%.
+          </p>
         </div>
-<figure>
+
+        <div class="example">
+          <span class="label">Example</span>
+          <p>
+            Task difficulty affects whether people use the assistant.
+            Difficulty and the assistant both affect whether a task gets done.
+            Half the tasks are easy. With the assistant, 90% of easy tasks and
+            60% of hard tasks get done. Without it, 80% and 40% do.
+          </p>
+          <p>
+            <strong>Question:</strong> Does using the assistant raise the chance
+            that a task gets done?
+          </p>
+          <p>
+            <strong>Answer:</strong> Yes. Compare easy tasks with easy tasks and
+            hard with hard, then average. With the assistant, 75% of tasks get
+            done. Without it, 60% do.
+            <a href="#causal-model">Full calculation.</a>
+          </p>
+        </div>
+
+        <div class="section-copy">
+          <p>
+            The name CLadder comes from the “ladder of causation,” an idea from
+            the computer scientist Judea Pearl. The ladder has three rungs.
+            Each rung asks a different kind of question.
+          </p>
+        </div>
+
+        <figure>
           <div class="figure-title">
             <span class="figure-number">01</span>
-            Three different questions
+            The three rungs
           </div>
           <div class="figure-body rungs">
             <div class="rung">
-              <small>Seeing · Association</small>
-              <h3>What do we observe?</h3>
-              <p>Do assistant users finish more tasks?</p>
+              <small>Rung 1 · Association</small>
+              <h3>Seeing</h3>
+              <p>Do people who use the assistant finish more tasks?</p>
             </div>
             <div class="rung">
-              <small>Doing · Intervention</small>
-              <h3>What would change?</h3>
-              <p>Would assigning the assistant improve completion?</p>
+              <small>Rung 2 · Intervention</small>
+              <h3>Doing</h3>
+              <p>If we gave everyone the assistant, would more tasks get done?</p>
             </div>
             <div class="rung">
-              <small>Imagining · Counterfactual</small>
-              <h3>What if we acted differently?</h3>
-              <p>Would this failed task have succeeded with the assistant?</p>
+              <small>Rung 3 · Counterfactual</small>
+              <h3>Imagining</h3>
+              <p>This task failed without the assistant. Would it have worked with it?</p>
             </div>
           </div>
           <figcaption>
-            Similar wording; different causal questions.
-            <a href="#causal-model">See the mathematics.</a>
+            The three questions sound alike. Rung 1 can be answered from records
+            alone. Rungs 2 and 3 also need to know what causes what.
+            <a href="#causal-model">See the math.</a>
           </figcaption>
         </figure>
       </section>
 
       <section aria-labelledby="results-heading">
-<div class="section-copy">
-        <div class="section-head">
-          <h2 id="results-heading">High scores can hide uneven skills</h2>
-          <a href="#fixed-results">Full results table</a>
+        <div class="section-copy">
+          <div class="section-head">
+            <h2 id="results-heading">High overall scores can hide weak spots</h2>
+            <a href="#fixed-results">Full table</a>
+          </div>
+          <p>
+            Claude Opus 5.5 answers 97.20% of the questions correctly.
+            Gemini Argon scores 95.67% and GPT-6.1 Sol scores 94.36%.
+            In the original 2023 paper, GPT-4 scored 62.03%, or 70.40% with a
+            step-by-step prompt.
+          </p>
+          <p>
+            Claude Sonnet 4.6 scores
+            91.16% on rung 3 questions but 84.78% on rung 2, the step below.
+          </p>
         </div>
-        <p>
-          Claude Opus 5.5 has the highest overall score at 97.20%.
-          Gemini Argon scores 95.67% and GPT-6.1 Sol 94.36%. Sonnet’s breakdown
-          illustrates why one number is insufficient: 91.16% on
-          counterfactuals, but 84.78% on interventions.
-        </p>
 
-        </div>
-<figure>
+        <figure>
           <div class="figure-title">
             <span class="figure-number">02</span>
             Overall accuracy
           </div>
           <div class="figure-body" id="overall-chart"></div>
           <figcaption>
-            Bars use a 0–100% scale; the dashed midpoint marks 50% random
-            guessing. Historical rows provide context, not a matched comparison.
+            Share of questions answered correctly. The dashed line marks 50%,
+            the score of random guessing. Each model ran with its own settings,
+            so small gaps between models mean little. The GPT-4 rows come from
+            the original paper, which used a different setup.
           </figcaption>
         </figure>
       </section>
 
       <section aria-labelledby="synthetic-heading">
-<div class="section-copy">
-        <div class="section-head">
-          <h2 id="synthetic-heading">Does the pattern hold on fresh questions?</h2>
-          <a href="#synthetic-results">Run details</a>
+        <div class="section-copy">
+          <div class="section-head">
+            <h2 id="synthetic-heading">Do the results hold on new questions?</h2>
+            <a href="#synthetic-results">Details</a>
+          </div>
+          <p>
+            Public test questions can end up in the data a model learns from.
+            A new batch of questions, with the same ten question types, checks
+            whether the results carry over. We tested GPT-5.5 and
+            Claude Opus 4.8 on it.
+          </p>
+          <p>
+            GPT-5.5 scores 92.87% and Opus 4.8 scores 90.00%. Both are a little
+            below their scores on the public test (95.09% and 91.39%). Their
+            order stays the same. GPT-5.5 leads on every rung, and its lead
+            grows at each step up: 0.40 points, then 2.22, then 5.44.
+          </p>
         </div>
-        <p>
-          CLadder is already synthetic. A separately generated batch reports
-          92.87% for GPT-5.5 and 90.00% for Opus 4.8. Their largest rung-level
-          gap is on counterfactuals: 5.44 percentage points.
-        </p>
 
-        </div>
-<figure>
+        <figure>
           <div class="figure-title">
             <span class="figure-number">03</span>
-            Separate generated batch
+            Accuracy on the new batch, by rung
           </div>
           <div class="figure-body">
             <div class="legend">
               <span><i class="key" aria-hidden="true"></i>GPT-5.5</span>
-              <span><i class="key orange" aria-hidden="true"></i>Opus 4.8</span>
+              <span><i class="key orange" aria-hidden="true"></i>Claude Opus 4.8</span>
             </div>
             <div id="rung-chart"></div>
           </div>
           <figcaption>
-            Accuracy on the generated batch, shown on a 0–100% scale.
+            A point here means one percentage point. 92% and 87% are 5 points apart.
           </figcaption>
         </figure>
       </section>
 
       <section aria-labelledby="errors-heading">
-<div class="section-copy">
-        <div class="section-head">
-          <h2 id="errors-heading">Where do answers fail?</h2>
-          <a href="#error-analysis">Error analysis</a>
+        <div class="section-copy">
+          <div class="section-head">
+            <h2 id="errors-heading">Where do the models go wrong?</h2>
+            <a href="#error-analysis">Details</a>
+          </div>
+          <p>
+            On the new batch, both models handle confounder questions well and
+            collider questions badly.
+          </p>
+          <p>
+            A <strong>confounder</strong> is a factor that affects both the
+            action and the outcome. Task difficulty in the example above is one.
+            The fix is to compare like with like, which is called backdoor
+            adjustment. Both models got every one of these questions right.
+          </p>
+          <p>
+            A <strong>collider</strong> works the other way: two factors both
+            cause it. Suppose a college admits students who are strong at sport
+            or strong at their studies, and the two skills are unrelated in
+            general. Among admitted students, athletes will tend to have lower
+            grades. The link appears only because we looked at admitted students.
+            On collider questions, both models score below 60%, not far above
+            guessing.
+          </p>
+          <p>
+            A separate review read the reasoning behind wrong answers from
+            Claude Sonnet 4.6 and Gemini 2.5 Flash. Three mistakes stood out.
+            The reasoning looks right, but the final answer is flipped. The
+            model says an effect raises the outcome when it lowers it, or the
+            reverse. Or it adjusts for a factor it should leave alone.
+          </p>
         </div>
-        <p>
-          Collider-bias questions stand out: both models score below 60%,
-          despite reaching 100% on this batch’s backdoor-adjustment items.
-          A separate trace review flags final-answer reversals,
-          effect-direction mistakes, and adjustment confusion.
-        </p>
 
-        </div>
-<figure>
+        <figure>
           <div class="figure-title">
             <span class="figure-number">04</span>
-            Three revealing question types
+            Three question types on the new batch
           </div>
           <div class="figure-body" id="error-chart"></div>
           <figcaption>
-            Synthetic-run accuracy. These patterns locate weaknesses;
-            they do not establish the cause of an individual error.
+            Accuracy on the new batch.
           </figcaption>
         </figure>
 
         <p class="takeaway">
-          Strong aggregate scores do not establish reliable causal reasoning
-          across every operation. Inspect the question types—and the evidence
-          behind the scores.
+          A model can score 90% overall and still get collider questions
+          right only slightly more than half the time.
         </p>
         <p>
-          <a href="#report">Read the full report, methods, and open questions.</a>
+          <a href="#report">Read the full report.</a>
         </p>
       </section>
     </article>
@@ -293,43 +371,48 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
 
       <h2>Detailed report</h2>
       <p class="muted">
-        Benchmark construction, mathematical examples, evaluation results,
-        and open questions.
+        How the test works, how we scored the models, full results, and open
+        questions.
       </p>
 
       <nav class="jump" aria-label="Report sections">
         <a href="#dataset">Dataset</a>
-        <a href="#causal-model">Causal mathematics</a>
-        <a href="#methods">Evaluation</a>
-        <a href="#fixed-results">Fixed results</a>
-        <a href="#synthetic-results">Generated batch</a>
+        <a href="#causal-model">The math</a>
+        <a href="#methods">Scoring</a>
+        <a href="#fixed-results">Public-test results</a>
+        <a href="#synthetic-results">New questions</a>
         <a href="#error-analysis">Errors</a>
         <a href="#limitations">Open questions</a>
+        <a href="#terms">Key terms</a>
         <a href="#references">References</a>
       </nav>
 
       <section id="dataset">
         <h2>1. What CLadder measures</h2>
         <p>
-          CLadder tests causal reasoning from a described structure and supplied
-          numerical information. It does not generally ask a model to discover
-          a causal graph from a spreadsheet. Its generator constructs causal
-          worlds, translates questions into language, and derives reference
-          answers independently of the evaluated model.
+          CLadder tests whether a model can reason from a causal story it is
+          given. The story says which factors cause which and supplies the
+          numbers. CLadder does not ask the model to find causes in raw data.
         </p>
         <p>
-          The balanced v1.5 dataset contains <strong>10,112 questions</strong>:
-          3,160 association, 3,160 intervention, and 3,792 counterfactual items.
-          There are 5,056 yes and 5,056 no labels overall. A uniform random
-          yes/no guess has expected accuracy of 50%.
+          A program writes the questions. It builds a small causal world,
+          phrases a question about it in plain English, and computes the right
+          answer with formulas. The model being tested plays no part in
+          setting the answers.
         </p>
         <p>
-          The authors’ corrected Hugging Face file is
+          The balanced version 1.5 has <strong>10,112 questions</strong>:
+          3,160 on association (rung 1), 3,160 on intervention (rung 2), and
+          3,792 on counterfactuals (rung 3). Exactly 5,056 answers are yes and
+          5,056 are no. A random yes/no guess scores 50% on average.
+        </p>
+        <p>
+          Use the authors’ corrected file on Hugging Face,
           <a href="https://huggingface.co/datasets/causal-nlp/CLadder/blob/18d684e444ed07cc57ae0f3a91ee983a79b8119a/data/full_v1.5_default.csv"><code>full_v1.5_default.csv</code></a>.
-          Its <code>prompt</code> includes the actual question. The similarly
-          named <code>test-balanced-v1.5.csv</code> omits question text from
-          its prompt field. Load the corrected CSV explicitly rather than
-          combining different dataset versions.
+          Its <code>prompt</code> column holds the full question. A file with a
+          similar name, <code>test-balanced-v1.5.csv</code>, leaves the question
+          out of that column. Load the corrected file by name, and don’t mix
+          files from different versions.
         </p>
         <div class="note">
           Dataset revision:
@@ -338,39 +421,52 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
       </section>
 
       <section id="causal-model">
-        <h2>2. Three questions, three mathematical objects</h2>
+        <h2>2. The math behind the three rungs</h2>
         <p>
-          Let X denote assistant use and Y task completion; 1 means yes and
-          0 means no. Association describes an observed group, intervention
-          changes an action, and a counterfactual changes an action while
-          retaining evidence about a particular case.
+          Let X be assistant use and Y task completion. 1 means yes and 0 means
+          no. Each rung asks for a different quantity.
         </p>
         <div class="equation">
-          <span>Association: P(Y = 1 | X = 1)</span>
-          <span>Intervention: P(Y = 1 | do(X = 1))</span>
-          <span>Counterfactual: P(Y₁ = 1 | X = 0, Y = 0)</span>
+          <span>Rung 1, association: P(Y = 1 | X = 1)</span>
+          <span class="gloss">
+            Among tasks where people used the assistant, what share got done?
+          </span>
+          <span>Rung 2, intervention: P(Y = 1 | do(X = 1))</span>
+          <span class="gloss">
+            If we made everyone use the assistant, what share of tasks would get
+            done? The do( ) means we set X ourselves instead of only watching it.
+          </span>
+          <span>Rung 3, counterfactual: P(Y₁ = 1 | X = 0, Y = 0)</span>
+          <span class="gloss">
+            Among tasks done without the assistant that failed, what share would
+            have succeeded with it? Y₁ is the outcome had X been 1.
+          </span>
         </div>
         <p>
-          A structural causal model consists of background variables U,
-          observed variables V, structural rules F, and a distribution P(U).
-          Each variable follows a rule based on its direct causes, Paⱼ,
-          and background factors:
+          A structural causal model describes a world as a set of rules. It has
+          four parts: background factors U that we don’t observe, observed
+          variables V, rules F, and a probability distribution over the
+          background factors, P(U). A rule sets each observed variable from its
+          direct causes, Paⱼ, and its own background factors, Uⱼ:
         </p>
         <div class="equation">
           <span>𝓜 = (U, V, F, P(U))</span>
           <span>Vⱼ = fⱼ(Paⱼ, Uⱼ)</span>
         </div>
         <p>
-          An intervention replaces X’s rule with X := x, removing incoming
-          arrows to X while preserving the other mechanisms. This differs
-          from selecting cases where X already equals x.
+          An intervention swaps the rule for X with a fixed value, X := x.
+          Arrows into X disappear. Every other rule stays the same. This is not
+          the same as picking out the cases where X already equals x. Those
+          cases may differ in other ways, such as task difficulty.
         </p>
 
-        <h3>A worked adjustment example</h3>
+        <h3>Worked example: adjusting for a confounder</h3>
         <p>
-          Suppose task difficulty Z causes both assistant use and completion.
-          For a valid backdoor adjustment set Z, compare outcomes within each
-          difficulty group and average using the same population weights:
+          Suppose task difficulty Z affects both assistant use and completion.
+          Z is then a confounder. To remove its effect, compare outcomes within
+          each difficulty level. Then average, weighting each level by its share
+          of all tasks. When Z is a valid adjustment set, this is the backdoor
+          adjustment formula:
         </p>
         <div class="equation">
           <span>
@@ -379,9 +475,9 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
           </span>
         </div>
         <p>
-          For illustration, half the tasks are easy and half hard. Completion
-          probabilities with the assistant are 0.90 and 0.60; without it,
-          0.80 and 0.40.
+          Now add numbers. Half the tasks are easy and half are hard. With the
+          assistant, 90% of easy tasks and 60% of hard tasks get done. Without
+          it, 80% and 40% do.
         </p>
         <div class="equation">
           <span>With assistant: 0.90 × 0.50 + 0.60 × 0.50 = 0.75</span>
@@ -389,26 +485,32 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
           <span>ATE = E[Y | do(X = 1)] − E[Y | do(X = 0)] = 0.15</span>
         </div>
         <p>
-          The average treatment effect is a 15-percentage-point increase.
-          This example assumes valid adjustment and sufficient representation
-          of both actions in each group. Conditioning on arbitrary variables
-          can instead introduce bias: a collider is a common effect, and
-          conditioning on it can create an association between its causes.
+          The assistant raises completion by 15 percentage points on average.
+          This number is the average treatment effect (ATE). The calculation
+          holds only if Z is the right factor to adjust for. Both easy and hard
+          tasks must also occur with and without the assistant.
+        </p>
+        <p>
+          Adjusting for the wrong factor can add bias. A collider is a factor
+          that two others both cause. Filtering or adjusting on a collider can
+          create a link between its causes where none exists.
         </p>
 
-        <h3>Calculating a counterfactual</h3>
+        <h3>Computing a counterfactual</h3>
+        <p>A counterfactual takes three steps.</p>
         <ol>
           <li>
-            <strong>Abduction:</strong> use observed evidence E = e to update
-            P(U) to P(U | E = e).
+            <strong>Abduction (work backward).</strong> Use what you observed,
+            E = e, to update your beliefs about the background factors.
+            P(U) becomes P(U | E = e).
           </li>
           <li>
-            <strong>Action:</strong> replace X’s rule with X := x,
-            producing model 𝓜ₓ.
+            <strong>Action.</strong> Replace the rule for X with X := x.
+            Call the new model 𝓜ₓ.
           </li>
           <li>
-            <strong>Prediction:</strong> evaluate the alternative outcome
-            with those updated background conditions.
+            <strong>Prediction.</strong> Compute the outcome in 𝓜ₓ, using the
+            updated background factors.
           </li>
         </ol>
         <div class="equation">
@@ -418,142 +520,154 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
           </span>
         </div>
         <p>
-          This discrete sum becomes an integral for continuous background
-          variables. A graph and observed probabilities do not identify every
-          counterfactual: the supplied information and assumptions must
-          determine a unique answer. CLadder constructs answerable problems.
+          𝟙[ ] equals 1 when the statement inside is true and 0 when it is
+          false. For continuous background factors, the sum becomes an integral.
+          A graph and some probabilities don’t always fix one answer to a
+          counterfactual question. CLadder only includes questions where the
+          given information is enough.
         </p>
       </section>
 
       <section id="methods">
-        <h2>3. Inputs, prompting, and scoring</h2>
+        <h2>3. How we scored the models</h2>
         <p>
-          For item i, the model receives question qᵢ and predicts âᵢ.
-          The gold answer aᵢ, reference reasoning, and ground-truth metadata
-          must stay out of its input. Accuracy is computed from the final
-          yes/no answer:
+          For each question qᵢ, the model gives an answer âᵢ. It never sees the
+          correct answer aᵢ, the reference reasoning, or any hidden labels.
+          We score only the final yes or no:
         </p>
         <div class="equation">
           <span>
             Accuracy (%) = 100 × (number of correct answers) /
-            (number of evaluated questions)
+            (number of questions evaluated)
           </span>
         </div>
         <p>
-          Rung and query-type accuracy use their own denominators. Overall
-          accuracy is weighted by item counts; it is not generally the simple
-          average of the three rung scores.
+          Rung and question-type scores use their own question counts. The
+          overall score counts each question once. Rung 3 has more questions
+          than the other two, so the overall score is not the plain average of
+          the three rung scores.
         </p>
         <p>
-          The earlier seven-model evaluation used OpenRouter calls,
-          CausalCoT prompting, and 10,112 questions per configuration.
+          The earlier run covered seven models: GPT-5.5, Grok 4.20,
+          Claude Opus 4.8, Claude Sonnet 4.6, DeepSeek V3.2, Gemini 2.5 Flash
+          and GPT-5.4 Nano. Each model got all 10,112 questions through
+          OpenRouter, a service that passes requests on to many model
+          providers. All seven used CausalCoT prompting.
         </p>
+        <p>CausalCoT asks the model to solve each problem in six steps:</p>
+        <ol>
+          <li>Pull the causal graph out of the text.</li>
+          <li>Name the type of question.</li>
+          <li>Write the question as a formula.</li>
+          <li>List the probabilities given.</li>
+          <li>Work out which formula answers the question.</li>
+          <li>Calculate the answer.</li>
+        </ol>
         <p>
-          CausalCoT organizes a solution into six steps: extract the causal
-          graph; identify the query type; express the query symbolically;
-          collect the supplied probabilities; derive the estimand; and
-          calculate the answer. The original paper’s implementation also
-          uses a separate answer-extraction turn. Asking for these steps
-          does not guarantee they are followed correctly.
+          The original paper also used a second turn to pull out the final
+          answer. Asking for these steps does not mean the model follows them
+          correctly.
         </p>
         <div class="note">
-          Models and reasoning settings differ across the evaluated
-          configurations. The historical paper rows use
-          <code>gpt-4-1106-preview</code> at temperature 0.
-          Neither comparison isolates the effect of additional reasoning alone.
+          Models and reasoning settings differ between runs. The original
+          paper’s rows use <code>gpt-4-1106-preview</code> at temperature 0
+          (minimal randomness). No comparison on this page isolates the effect
+          of extra reasoning alone.
         </div>
       </section>
 
       <section id="fixed-results">
-        <h2>4. Fixed-benchmark results</h2>
+        <h2>4. Results on the public test</h2>
         <p>
-          The leaderboard includes Claude Opus 5.5, GPT-6.1 Sol and Gemini Argon
-          alongside the earlier results. The Opus 5.5 and GPT-6.1 Sol runs use
-          medium reasoning and concise explanations on 10,112 questions.
-          Gemini Argon uses high reasoning, a zero-shot instruction to answer
-          only yes or no, and a 6,144-token completion limit that includes
-          reasoning. Evaluation protocols differ across runs. The original-paper baselines are shown separately and
-          cited to
-          <a href="https://arxiv.org/html/2312.04350v3#S5.T2">Table 2</a>.
-          They are historical reported measurements, not reruns.
+          The table adds three newer models to the earlier seven:
+          Claude Opus 5.5, Gemini Argon and GPT-6.1 Sol. Their settings differ:
         </p>
+        <ul>
+          <li>
+            Claude Opus 5.5 and GPT-6.1 Sol used medium reasoning and gave a
+            short explanation with each answer. Both ran on all 10,112 questions.
+          </li>
+          <li>
+            Gemini Argon used high reasoning and was told to answer only yes or
+            no. Its output was capped at 6,144 tokens, and the cap includes its
+            reasoning.
+          </li>
+          <li>
+            The two GPT-4 rows come from
+            <a href="https://arxiv.org/html/2312.04350v3#S5.T2">Table 2</a>
+            of the original paper. We report them as published and did not
+            rerun them.
+          </li>
+        </ul>
 
         <div
           class="table-scroll"
           tabindex="0"
-          aria-label="Fixed results; scroll horizontally if needed">
+          aria-label="Results on the public test; scroll sideways if needed">
           <table class="data wide" id="fixed-table">
             <caption>
-              CLadder v1.5 accuracy (%), ordered by overall score.
-              Evaluation protocols differ across runs.
+              CLadder v1.5 accuracy (%), sorted by overall score.
+              Settings differ between runs.
             </caption>
             <thead>
               <tr>
-                <th scope="col">Model / reported setting</th>
+                <th scope="col">Model</th>
                 <th scope="col">Overall</th>
-                <th scope="col">Association</th>
-                <th scope="col">Intervention</th>
-                <th scope="col">Counterfactual</th>
+                <th scope="col">Rung 1<br>Association</th>
+                <th scope="col">Rung 2<br>Intervention</th>
+                <th scope="col">Rung 3<br>Counterfactual</th>
               </tr>
             </thead>
             <tbody>
-<tr class="latest" data-model="anthropic/claude-opus-5.5"><th scope="row"><span class="model-name">Claude Opus 5.5</span><small>Medium reasoning · concise explanation<br><code>anthropic/claude-opus-5.5</code></small></th><td>97.20</td><td>97.41</td><td>99.53</td><td>95.09</td></tr>
-<tr class="latest" data-model="google/gemini-4-argon"><th scope="row"><span class="model-name">Gemini Argon</span><small>High reasoning · zero-shot yes/no · 6,144-token limit<br><code>google/gemini-4-argon</code></small></th><td>95.67</td><td>97.41</td><td>94.97</td><td>94.80</td></tr>
+<tr class="latest" data-model="anthropic/claude-opus-5.5"><th scope="row"><span class="model-name">Claude Opus 5.5</span><small>Reasoning on</small></th><td>97.20</td><td>97.41</td><td>99.53</td><td>95.09</td></tr>
+<tr class="latest" data-model="google/gemini-4-argon"><th scope="row"><span class="model-name">Gemini Argon</span><small>Reasoning on</small></th><td>95.67</td><td>97.41</td><td>94.97</td><td>94.80</td></tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">GPT-5.5</span>
-                  <small>High reasoning · <code>openai/gpt-5.5</code></small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>95.09</td><td>97.78</td><td>96.64</td><td>91.17</td>
               </tr>
-<tr class="latest" data-model="openai/gpt-6.1-sol"><th scope="row"><span class="model-name">GPT-6.1 Sol</span><small>Medium reasoning · concise explanation<br><code>openai/gpt-6.1-sol</code></small></th><td>94.36</td><td>97.22</td><td>96.99</td><td>89.79</td></tr>
+<tr class="latest" data-model="openai/gpt-6.1-sol"><th scope="row"><span class="model-name">GPT-6.1 Sol</span><small>Reasoning on</small></th><td>94.36</td><td>97.22</td><td>96.99</td><td>89.79</td></tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">Grok 4.20</span>
-                  <small>Reasoning enabled · <code>xai/grok-4.20</code></small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>93.26</td><td>96.77</td><td>94.46</td><td>89.32</td>
               </tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">Claude Opus 4.8</span>
-                  <small>
-                    16k thinking budget · <code>anthropic/claude-opus-4.8</code>
-                  </small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>91.39</td><td>92.88</td><td>94.46</td><td>87.59</td>
               </tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">Claude Sonnet 4.6</span>
-                  <small>
-                    8k thinking budget · <code>anthropic/claude-sonnet-4.6</code>
-                  </small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>91.09</td><td>97.31</td><td>84.78</td><td>91.16</td>
               </tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">DeepSeek V3.2</span>
-                  <small>
-                    Reasoning enabled · <code>deepseek/deepseek-v3.2</code>
-                  </small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>90.91</td><td>97.15</td><td>92.75</td><td>83.99</td>
               </tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">Gemini 2.5 Flash</span>
-                  <small>
-                    Reasoning enabled · <code>google/gemini-2.5-flash</code>
-                  </small>
+                  <small>Reasoning on</small>
                 </th>
                 <td>85.43</td><td>96.70</td><td>83.26</td><td>77.85</td>
               </tr>
 <tr>
                 <th scope="row">
                   <span class="model-name">GPT-5.4 Nano</span>
-                  <small>No reasoning · <code>openai/gpt-5.4-nano</code></small>
+                  <small>No reasoning</small>
                 </th>
                 <td>54.80</td><td>54.34</td><td>58.14</td><td>52.40</td>
               </tr>
@@ -564,19 +678,19 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         <div
           class="table-scroll"
           tabindex="0"
-          aria-label="Historical results; scroll horizontally if needed">
+          aria-label="Results from the original paper; scroll sideways if needed">
           <table class="data wide" id="historical-table">
             <caption>
-              Original CLadder paper, Table 2:
-              historical v1.5 results under its evaluation protocol.
+              Original CLadder paper, Table 2. Version 1.5 results under that
+              paper’s setup.
             </caption>
             <thead>
               <tr>
-                <th scope="col">Historical configuration</th>
+                <th scope="col">Model and prompt</th>
                 <th scope="col">Overall</th>
-                <th scope="col">Association</th>
-                <th scope="col">Intervention</th>
-                <th scope="col">Counterfactual</th>
+                <th scope="col">Rung 1<br>Association</th>
+                <th scope="col">Rung 2<br>Intervention</th>
+                <th scope="col">Rung 3<br>Counterfactual</th>
               </tr>
             </thead>
             <tbody>
@@ -595,59 +709,61 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         </div>
 
         <p>
-          GPT-5.5 and Sonnet’s counterfactual scores differ by just
-          0.01 percentage points. This is not evidence of a meaningful
-          advantage. Nano’s lower result also cannot isolate the effect of
-          reasoning, because both the model and its configuration change.
+          GPT-5.5 and Claude Sonnet 4.6 differ by 0.01 points on
+          counterfactuals (91.17% against 91.16%). That gap is too small to
+          matter. GPT-5.4 Nano’s low score doesn’t show the effect of reasoning
+          either, because both the model and its settings differ from the others.
         </p>
         <p>
-          Gemini Argon’s score counts 175 invalid responses as incorrect:
-          173 hit the token limit before giving an answer and 2 ended with a
-          provider error. Of its 438 misses, 263 are wrong yes/no answers.
-          On the 9,937 valid answers, accuracy is 97.35%. The truncations
-          concentrate on intervention questions (149 of 175), and they account
-          for all 84 missed backdoor-adjustment items and all 64 missed
-          collider-bias items, where Argon scores 59.49%. Its intervention
-          score therefore reflects the token limit as well as reasoning.
+          Gemini Argon gave 175 invalid responses, and these count as wrong.
+          Of these, 173 ran out of tokens
+          before giving an answer and 2 ended in a provider error. So 263 of its
+          438 misses are actual wrong answers. On its 9,937 valid answers,
+          Argon scores 97.35%.
+        </p>
+        <p>
+          Most invalid responses (149 of 175) are on rung 2. They make up all
+          84 of Argon’s misses on backdoor-adjustment questions and all 64 of
+          its misses on collider questions, where it scores 59.49%. Its rung 2
+          score reflects the token cap as well as its reasoning.
         </p>
       </section>
 
       <section id="synthetic-results">
-        <h2>5. Separately generated questions</h2>
+        <h2>5. Results on a new batch of questions</h2>
         <p>
-          This evaluation uses a separately generated set of causal questions,
-          distinct from the fixed public benchmark. It compares GPT-5.5 and
-          Claude Opus 4.8 across the three reasoning levels and individual
-          question types.
+          This test uses a new set of causal questions, separate from the
+          public benchmark. It covers the same three rungs and the same ten
+          question types. We ran GPT-5.5 and Claude Opus 4.8 on it.
         </p>
 
         <div
           class="table-scroll"
           tabindex="0"
-          aria-label="Synthetic results; scroll horizontally if needed">
+          aria-label="Results on the new batch; scroll sideways if needed">
           <table class="data wide" id="synthetic-table">
             <caption>
-              Accuracy on the separately generated batch (%).
+              Accuracy on the new batch (%).
             </caption>
             <thead>
               <tr>
                 <th scope="col">Model</th>
                 <th scope="col">Overall</th>
-                <th scope="col">Association</th>
-                <th scope="col">Intervention</th>
-                <th scope="col">Counterfactual</th>
+                <th scope="col">Rung 1<br>Association</th>
+                <th scope="col">Rung 2<br>Intervention</th>
+                <th scope="col">Rung 3<br>Counterfactual</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <th scope="row">
-                  GPT-5.5<small>High reasoning effort</small>
+                  GPT-5.5<small>Reasoning on</small>
                 </th>
                 <td>92.87</td><td>94.06</td><td>92.39</td><td>92.21</td>
               </tr>
               <tr>
                 <th scope="row">
-                  Claude Opus 4.8<small>16k thinking budget</small>
+                  Claude Opus 4.8<small>Reasoning on</small>
                 </th>
                 <td>90.00</td><td>93.66</td><td>90.17</td><td>86.77</td>
               </tr>
@@ -656,22 +772,21 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         </div>
 
         <p>
-          The overall gap is 2.87 percentage points. By rung,
-          it is 0.40 for association, 2.22 for intervention, and 5.44 for
-          counterfactuals.
+          GPT-5.5 leads by 2.87 points overall. Its lead is 0.40 points on
+          association, 2.22 on intervention, and 5.44 on counterfactuals.
         </p>
 
         <div
           class="table-scroll"
           tabindex="0"
-          aria-label="Query-type results; scroll horizontally if needed">
+          aria-label="Results by question type; scroll sideways if needed">
           <table class="data" id="query-table">
             <caption>
-              Generated-batch results by question type. Accuracy (%).
+              New-batch accuracy by question type (%).
             </caption>
             <thead>
               <tr>
-                <th scope="col">Question type / meaning</th>
+                <th scope="col">Question type and what it asks</th>
                 <th scope="col">GPT-5.5</th>
                 <th scope="col">Opus 4.8</th>
               </tr>
@@ -681,7 +796,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Average treatment effect</span>
                   <small>
-                    Average effect of changing an action across the population.
+                    How much an action changes the outcome, averaged over everyone.
                   </small>
                 </th>
                 <td>96.55</td><td>93.63</td>
@@ -689,7 +804,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
               <tr data-query="backadj">
                 <th scope="row">
                   <span class="query-name">Backdoor adjustment</span>
-                  <small>Whether an adjustment set removes confounding.</small>
+                  <small>Whether adjusting for a set of factors removes a confounder’s effect.</small>
                 </th>
                 <td>100.00</td><td>100.00</td>
               </tr>
@@ -697,8 +812,8 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Collider bias</span>
                   <small>
-                    Whether conditioning on a common effect introduces
-                    association.
+                    Whether filtering on a shared effect creates a false link
+                    between its causes.
                   </small>
                 </th>
                 <td>54.21</td><td>58.11</td>
@@ -706,7 +821,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
               <tr data-query="correlation">
                 <th scope="row">
                   <span class="query-name">Correlation</span>
-                  <small>How a probability differs with another variable.</small>
+                  <small>Whether an outcome is more or less likely when another factor is present.</small>
                 </th>
                 <td>91.47</td><td>91.21</td>
               </tr>
@@ -714,8 +829,8 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Deterministic counterfactual</span>
                   <small>
-                    The outcome under an alternative action in a
-                    deterministic model.
+                    What would have happened after a different action, when the
+                    rules involve no chance.
                   </small>
                 </th>
                 <td>95.51</td><td>93.90</td>
@@ -724,7 +839,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Effect on the treated</span>
                   <small>
-                    The action’s effect for those who actually took it.
+                    The action’s effect on those who actually took it.
                   </small>
                 </th>
                 <td>94.55</td><td>89.21</td>
@@ -733,8 +848,8 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Explaining away</span>
                   <small>
-                    How evidence for one cause changes belief in another
-                    after observing their common effect.
+                    How learning about one cause changes belief in another,
+                    once their shared effect is known.
                   </small>
                 </th>
                 <td>95.17</td><td>91.72</td>
@@ -743,7 +858,8 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
                 <th scope="row">
                   <span class="query-name">Marginal probability</span>
                   <small>
-                    A probability without conditioning on another variable.
+                    The overall chance of an outcome, without filtering on
+                    anything else.
                   </small>
                 </th>
                 <td>96.58</td><td>96.31</td>
@@ -751,14 +867,14 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
               <tr data-query="nde">
                 <th scope="row">
                   <span class="query-name">Natural direct effect</span>
-                  <small>The effect not passing through a specified mediator.</small>
+                  <small>The part of an effect that does not pass through a middle step.</small>
                 </th>
                 <td>92.41</td><td>89.87</td>
               </tr>
               <tr data-query="nie">
                 <th scope="row">
                   <span class="query-name">Natural indirect effect</span>
-                  <small>The effect passing through a specified mediator.</small>
+                  <small>The part of an effect that passes through a middle step.</small>
                 </th>
                 <td>82.62</td><td>75.29</td>
               </tr>
@@ -767,35 +883,47 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         </div>
 
         <p>
-          The largest query-type gap is 7.33 points on natural indirect
-          effects. Collider bias is the only listed type where Opus leads.
-          Perfect backdoor-adjustment accuracy applies only to this batch’s
-          evaluated items.
+          The two models differ most on natural indirect effects, by 7.33
+          points. Collider bias is the only type where Opus 4.8 leads. Both
+          models score 100% on backdoor adjustment, but only on the questions
+          in this batch.
         </p>
         <p>
-          The run produced zero null responses, a 47.2% output
-          “yes” rate for each model, and 3,574 captured GPT-5.5 traces versus
-          6,428 Opus traces. Output balance is not gold-label balance. Trace
-          availability does not measure thinking time or total computation.
+          Neither model returned an empty answer. Each answered “yes” 47.2% of
+          the time. The answer key may have a different split. We captured 3,574 reasoning traces from GPT-5.5 and 6,428 from
+          Opus 4.8. Trace counts don’t measure how long a model thought or how
+          much computing it used.
         </p>
       </section>
 
       <section id="error-analysis">
         <h2>6. Error analysis</h2>
         <p>
-          A separate trace review identifies three patterns.
-          An <strong>answer flip</strong> is an incorrect final answer
-          following apparently correct reasoning.
-          A <strong>direction error</strong> reverses whether an effect
-          increases or decreases an outcome.
-          <strong>Adjustment confusion</strong> mixes valid confounder
-          adjustment with harmful conditioning.
+          A separate review read the reasoning behind wrong answers from
+          Claude Sonnet 4.6 and Gemini 2.5 Flash on the public test. It flags
+          three patterns:
         </p>
+        <ul>
+          <li>
+            <strong>Answer flip.</strong> The reasoning looks right, but the
+            final yes or no is wrong.
+          </li>
+          <li>
+            <strong>Direction error.</strong> The model says an effect raises
+            the outcome when it lowers it, or the reverse.
+          </li>
+          <li>
+            <strong>Adjustment confusion.</strong> The model mixes valid
+            adjustment for a confounder with adjustment that adds bias.
+          </li>
+        </ul>
 
         <div class="table-scroll">
           <table class="data">
             <caption>
-              Flagged counts, not comparable error rates; categories may overlap.
+              Number of flagged answers. One answer can carry more than one
+              flag. These are counts, not error rates, so don’t compare them
+              directly.
             </caption>
             <thead>
               <tr>
@@ -806,15 +934,15 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
             </thead>
             <tbody>
               <tr>
-                <th scope="row">Final-answer flip</th>
+                <th scope="row">Answer flip</th>
                 <td>115</td><td>265</td>
               </tr>
               <tr>
-                <th scope="row">Effect-direction error</th>
+                <th scope="row">Direction error</th>
                 <td>163</td><td>12</td>
               </tr>
               <tr>
-                <th scope="row">Backdoor-adjustment confusion</th>
+                <th scope="row">Adjustment confusion</th>
                 <td>34</td><td>178</td>
               </tr>
             </tbody>
@@ -822,33 +950,30 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
         </div>
 
         <p>
-          The trace review covers 892 wrong answers for Sonnet and 1,456 for
-          Gemini, giving answer-flip shares of 12.9% and 18.2% within that review.
+          The review covers 892 wrong answers from Sonnet 4.6 and 1,456 from
+          Gemini 2.5 Flash. Answer flips make up 12.9% and 18.2% of these.
         </p>
 
         <details>
           <summary>
-            Same-model follow-up: forcing extra thinking on Opus 4.8
+            Follow-up: does making Opus 4.8 think more help?
           </summary>
           <p>
-            The follow-up found no returned extended thinking on
-            4,608 of 10,105 initial items. This does not establish that no
-            internal reasoning occurred. Rerunning that subset with a minimum
-            1,024-token thinking budget raised accuracy from 88.60%
-            to 90.23%.
+            In the first run, Opus 4.8 returned no visible reasoning on 4,608
+            of 10,105 questions. That does not prove it did no reasoning. We
+            reran those 4,608 questions with a minimum thinking budget of 1,024
+            tokens. Accuracy on them rose from 88.60% to 90.23%.
           </p>
           <p>
-            There were 114 corrections and 39 regressions: 75 net additional
-            correct answers, or approximately 1.63 percentage points across
-            4,608 items. The follow-up uses a different denominator from the
-            main leaderboard.
+            The rerun fixed 114 answers and broke 39. That is a net gain of 75
+            answers, about 1.63 points across the 4,608 questions. These figures
+            use a different question count from the main table.
           </p>
 
           <div class="table-scroll">
             <table class="data">
               <caption>
-                Accuracy changes on the rerun subset,
-                in percentage points.
+                Change in accuracy on the rerun questions, in percentage points.
               </caption>
               <thead>
                 <tr>
@@ -871,8 +996,9 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
           </div>
 
           <p>
-            These results show a net improvement on this subset; the effect
-            of additional thinking varies across question types.
+            Extra thinking helped on these questions overall, but not on every
+            type. Correlation questions gained 6.1 points. Marginal probability
+            and collider bias dropped slightly.
           </p>
         </details>
       </section>
@@ -880,57 +1006,109 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
       <section id="limitations">
         <h2>7. Open questions</h2>
         <p>
-          Historical and modern configurations differ in model, prompting,
-          and reasoning settings. Their scores show how each configuration
-          performed, but do not isolate which change caused an improvement.
+          The old and new runs differ in model, prompt, and reasoning settings.
+          Their scores show how each setup performed. They can’t tell us which
+          change caused the improvement.
         </p>
 
-        <h3>What should we test next?</h3>
-        <p>
-          Useful follow-ups include matched paraphrases with unchanged
-          answers; separate checks of graph interpretation, formula
-          selection, arithmetic, and final labels; paired reasoning-budget
-          comparisons on identical questions; and tasks that test whether a
-          model recognizes an unidentifiable causal effect. These are
-          proposed tests, not completed experiments.
-        </p>
+        <h3>What to test next</h3>
+        <ul>
+          <li>
+            Reworded versions of the same question, with the same answer. Does
+            the model give the same answer?
+          </li>
+          <li>
+            Separate checks for each step: reading the graph, choosing the
+            formula, doing the arithmetic, and giving the final yes or no.
+          </li>
+          <li>
+            The same questions at different reasoning budgets, to measure what
+            extra thinking adds.
+          </li>
+          <li>
+            Questions the given information cannot answer. Does the model
+            notice that the effect can’t be worked out?
+          </li>
+        </ul>
+        <p>These are proposals. We have not run them yet.</p>
+      </section>
+
+      <section id="terms">
+        <h2>Key terms</h2>
+        <dl class="terms">
+          <dt>Causal reasoning</dt>
+          <dd>Working out what causes what, and what would happen if something changed.</dd>
+          <dt>Rung</dt>
+          <dd>
+            One of three levels of causal question: association (seeing),
+            intervention (doing), and counterfactual (imagining).
+          </dd>
+          <dt>Confounder</dt>
+          <dd>
+            A factor that affects both the action and the outcome. Task
+            difficulty is a confounder if it affects both assistant use and
+            task completion.
+          </dd>
+          <dt>Backdoor adjustment</dt>
+          <dd>
+            Removing a confounder’s effect by comparing like with like, for
+            example easy tasks with easy tasks, then averaging.
+          </dd>
+          <dt>Collider</dt>
+          <dd>
+            A factor that two others both cause. Filtering on it can create a
+            false link between them.
+          </dd>
+          <dt>Mediator</dt>
+          <dd>
+            A middle step between an action and an outcome. The assistant
+            might save time, and the saved time might lead to more finished tasks.
+          </dd>
+          <dt>Percentage point</dt>
+          <dd>The plain difference between two percentages. 92% and 87% are 5 points apart.</dd>
+          <dt>Token and thinking budget</dt>
+          <dd>
+            A token is a word or part of a word. The thinking budget is how many
+            tokens a model may write while it works through a problem, before
+            it answers.
+          </dd>
+        </dl>
       </section>
 
       <section id="references">
         <h2>References and data sources</h2>
         <ol>
           <li>
-            Jin and colleagues.
+            Jin and colleagues (2023).
             <a href="https://arxiv.org/abs/2312.04350">
               CLadder: Assessing Causal Reasoning in Language Models
             </a>.
-            Historical GPT-4 results:
-            <a href="https://arxiv.org/html/2312.04350v3#S5.T2">Table 2</a>;
-            CausalCoT prompting: Appendix B.1.
+            GPT-4 results:
+            <a href="https://arxiv.org/html/2312.04350v3#S5.T2">Table 2</a>.
+            CausalCoT prompt: Appendix B.1.
           </li>
           <li>
             <a href="https://huggingface.co/datasets/causal-nlp/CLadder">
-              Authors’ CLadder dataset on Hugging Face
+              The authors’ CLadder dataset on Hugging Face
             </a>.
-            The corrected, pinned v1.5 CSV is linked in the dataset section.
+            The dataset section links the corrected, pinned v1.5 file.
           </li>
           <li>
             Pearl.
             <a href="https://ftp.cs.ucla.edu/pub/stat_ser/r350.pdf">
               Causal inference in statistics: An overview
             </a>
-            (2009), for causal models, interventions, and adjustment.
+            (2009). Causal models, interventions, and adjustment.
           </li>
           <li>
             Pearl.
             <a href="https://proceedings.mlr.press/v6/pearl10a/pearl10a.pdf">
               Causal Inference
             </a>
-            (2010), for the structural causal framework.
+            (2010). The structural causal framework.
           </li>
           <li>
-            Model evaluations, generated-batch results, and reasoning-trace
-            analyses presented in this study.
+            Model runs, new-batch results, and reasoning reviews: this study.
           </li>
         </ol>
       </section>
@@ -938,16 +1116,16 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
 
     <noscript>
       <p class="note">
-        Both article views and all data tables remain available.
-        JavaScript draws the overview charts and enables the view switcher.
+        Both views and all tables work without JavaScript. JavaScript draws
+        the overview charts and switches between the two views.
       </p>
     </noscript>
   </main>
 
   <footer>
-    CLadder measures reasoning in controlled causal problems.
-    Its scores alone do not establish reliable causal judgment
-    in the real world.
+    CLadder tests reasoning on controlled, made-up problems. A high score
+    does not show that a model will judge cause and effect well in the
+    real world.
   </footer>
 </div>
 
@@ -970,6 +1148,8 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
 
   const pct = value => `${value.toFixed(2)}%`;
 
+  const clean = text => text.replace(/\s+/g, ' ').trim();
+
   function bar(value, label, extra = '') {
     const row = el('div', undefined, `bar-row ${extra}`.trim());
 
@@ -988,12 +1168,12 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
     return row;
   }
 
-  // Report tables are the single data source for the overview figures.
+  // The report tables are the single data source for the overview figures.
   const overall = document.getElementById('overall-chart');
 
   for (const [id, label, cls] of [
-    ['fixed-table', 'CLadder v1.5 · reported model results', ''],
-    ['historical-table', 'Original paper · historical protocol', 'historical']
+    ['fixed-table', 'CLadder v1.5 · current models', ''],
+    ['historical-table', 'Original 2023 paper · GPT-4', 'historical']
   ]) {
     overall.append(el('div', label, 'chart-group'));
 
@@ -1017,13 +1197,19 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
   const synthetic = rows('synthetic-table');
   const rungChart = document.getElementById('rung-chart');
 
-  ['Association', 'Intervention', 'Counterfactual'].forEach((name, index) => {
+  [
+    ['Association', 'Rung 1'],
+    ['Intervention', 'Rung 2'],
+    ['Counterfactual', 'Rung 3']
+  ].forEach(([name, rung], index) => {
     const pair = el('div', undefined, 'pair');
-    pair.append(el('strong', name));
+    const label = el('strong');
+    label.append(el('small', rung), document.createTextNode(name));
+    pair.append(label);
 
     const lines = el('div', undefined, 'pair-lines');
 
-    ['GPT-5.5', 'Opus 4.8'].forEach((model, i) => {
+    ['GPT-5.5', 'Claude Opus 4.8'].forEach((model, i) => {
       const line = bar(
         number(synthetic[i], index + 2),
         null,
@@ -1043,7 +1229,7 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
 
   const caption = el(
     'caption',
-    'Selected synthetic question types: reported accuracy (%)',
+    'Accuracy on the new batch for three question types (%)',
     'sr-only'
   );
   heatmap.append(caption);
@@ -1062,17 +1248,18 @@ footer{border-top:1px solid var(--line);margin-top:70px;padding-top:24px;font:11
 
   const body = el('tbody');
 
-  ['collider_bias', 'nie', 'backadj'].forEach(code => {
+  ['backadj', 'collider_bias', 'nie'].forEach(code => {
     const source = document.querySelector(
       `#query-table tr[data-query="${code}"]`
     );
 
     const tr = el('tr');
-    const th = el(
-      'th',
-      source.querySelector('.query-name').textContent
-    );
+    const th = el('th');
     th.scope = 'row';
+    th.append(
+      document.createTextNode(clean(source.querySelector('.query-name').textContent)),
+      el('small', clean(source.querySelector('small').textContent))
+    );
     tr.append(th);
 
     [1, 2].forEach(column => {
